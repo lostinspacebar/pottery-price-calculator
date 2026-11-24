@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f1e8">
+  <title>Garnet Pottery Gallery Price Calculator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #29241f;
+      --muted: #71685f;
+      --paper: #fffdf9;
+      --canvas: #f6f1e8;
+      --line: #e7ded2;
+      --clay: #9c4f39;
+      --clay-dark: #713823;
+      --sage: #e8eee4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 16px 48px;
+      background: var(--canvas);
+      color: var(--ink);
+      font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    main { width: min(100%, 760px); margin: 0 auto; }
+    header { margin: 0 0 24px; }
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--clay-dark);
+      font-size: .75rem;
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2rem, 6vw, 3rem); line-height: 1.1; }
+    .intro { max-width: 600px; margin: 12px 0 0; color: var(--muted); }
+    form, .result-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--paper);
+      box-shadow: 0 8px 26px rgb(65 45 27 / 5%);
+    }
+    form { padding: clamp(18px, 4vw, 30px); }
+    fieldset { margin: 0; padding: 0; border: 0; }
+    legend { margin-bottom: 14px; font-size: 1.08rem; font-weight: 750; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .field { min-width: 0; }
+    label { display: block; margin-bottom: 6px; font-size: .91rem; font-weight: 650; }
+    .hint { display: block; margin-top: 4px; color: var(--muted); font-size: .78rem; font-weight: 400; }
+    .input-wrap { position: relative; }
+    .input-wrap .prefix { position: absolute; top: 50%; left: 12px; color: var(--muted); transform: translateY(-50%); pointer-events: none; }
+    input {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      border: 1px solid #cfc4b7;
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+    }
+    input[type="number"] { font-variant-numeric: tabular-nums; }
+    .input-wrap input { padding-left: 27px; }
+    input:focus-visible { outline: 3px solid rgb(156 79 57 / 25%); border-color: var(--clay); }
+    .section-break { height: 1px; margin: 24px 0; border: 0; background: var(--line); }
+    .result-card { margin-top: 18px; padding: 22px clamp(18px, 4vw, 30px); }
+    .result-label { margin: 0; color: var(--muted); font-size: .9rem; font-weight: 650; }
+    .result-price { margin: 2px 0 14px; color: var(--clay-dark); font-size: clamp(2.6rem, 10vw, 4rem); font-weight: 800; letter-spacing: -.045em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .breakdown { display: grid; gap: 8px; margin: 0; padding-top: 14px; border-top: 1px solid var(--line); }
+    .breakdown div { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: .9rem; }
+    .breakdown dt, .breakdown dd { margin: 0; }
+    .breakdown dd { color: var(--ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+    .note { margin: 14px 0 0; padding: 12px 14px; border-radius: 10px; background: var(--sage); color: #414a3e; font-size: .82rem; }
+    .error { min-height: 1.4em; margin: 10px 0 0; color: #a12e24; font-size: .85rem; }
+    footer { margin-top: 18px; color: var(--muted); font-size: .8rem; }
+    @media (max-width: 520px) { .grid { grid-template-columns: 1fr; gap: 13px; } body { padding-top: 24px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Garnet pricing model</p>
+      <h1>Gallery price calculator</h1>
+      <p class="intro">Build a piece price from your base and adjustments, then see the gallery price needed after commission, sales tax, and studio fee.</p>
+    </header>
+
+    <form id="calculator" novalidate>
+      <fieldset>
+        <legend>Price your piece</legend>
+        <div class="grid">
+          <div class="field">
+            <label for="base">Base price <span class="hint">Adjust this to suit the piece; Garnet's usual starting range is $20–$25.</span></label>
+            <div class="input-wrap"><span class="prefix" aria-hidden="true">$</span><input id="base" type="number" min="0" step="0.01" value="22.50" inputmode="decimal"></div>
+          </div>
+          <div class="field">
+            <label for="details">Details <span class="hint">$5 each — handles, feet, carving, or extra glaze work.</span></label>
+            <input id="details" type="number" min="0" step="1" value="0" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="size">Size steps above small <span class="hint">$5 per step.</span></label>
+            <input id="size" type="number" min="0" step="1" value="0" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="personal">Personal value <span class="hint">$0–$20 if you'd be happy to keep it.</span></label>
+            <div class="input-wrap"><span class="prefix" aria-hidden="true">$</span><input id="personal" type="number" min="0" max="20" step="1" value="0" inputmode="numeric"></div>
+          </div>
+          <div class="field">
+            <label for="unique">Uniqueness <span class="hint">$0–$20 for a unique piece.</span></label>
+            <div class="input-wrap"><span class="prefix" aria-hidden="true">$</span><input id="unique" type="number" min="0" max="20" step="1" value="0" inputmode="numeric"></div>
+          </div>
+          <div class="field">
+            <label for="popular">Popular design <span class="hint">$0–$10 for a popular style.</span></label>
+            <div class="input-wrap"><span class="prefix" aria-hidden="true">$</span><input id="popular" type="number" min="0" max="10" step="1" value="0" inputmode="numeric"></div>
+          </div>
+          <div class="field">
+            <label for="discount">Quick-sale discount <span class="hint">$0–$10 off if you'd like it to sell.</span></label>
+            <div class="input-wrap"><span class="prefix" aria-hidden="true">−$</span><input id="discount" type="number" min="0" max="10" step="1" value="0" inputmode="numeric"></div>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+
+    <section class="result-card" aria-live="polite" aria-atomic="true" aria-label="Gallery price result">
+      <p class="result-label">Suggested gallery listing price</p>
+      <p class="result-price" id="gallery-price">$40.11</p>
+      <dl class="breakdown">
+        <div><dt>Your piece price before gallery fees</dt><dd id="piece-price">$22.50</dd></div>
+        <div><dt>Gallery commission (25%)</dt><dd id="commission">$10.03</dd></div>
+        <div><dt>Sales tax (8.9%)</dt><dd id="sales-tax">$3.57</dd></div>
+        <div><dt>Studio fee (10%)</dt><dd id="studio-fee">$4.01</dd></div>
+      </dl>
+      <p class="note">Commission, tax, and studio fee are treated as shares of the listed price, so the maker receives the listed price less those three amounts. Sales tax is included in—not added on top of—the gallery price.</p>
+      <p class="error" id="error" role="alert"></p>
+    </section>
+    <footer>Estimates are rounded to the nearest cent. Confirm how your gallery calculates commission, tax, and studio fees.</footer>
+  </main>
+  <script>
+    (() => {
+      const form = document.getElementById('calculator');
+      const fields = ['base', 'details', 'size', 'personal', 'unique', 'popular', 'discount'];
+      const feeRates = { commission: 0.25, tax: 0.089, studio: 0.10 };
+      const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+      function update() {
+        const values = Object.fromEntries(fields.map((id) => [id, Number(document.getElementById(id).value)]));
+        const invalid = fields.some((id) => {
+          const input = document.getElementById(id);
+          return input.value === '' || !Number.isFinite(values[id]) || !input.checkValidity();
+        });
+        const error = document.getElementById('error');
+        if (invalid) {
+          error.textContent = 'Enter valid amounts. Adjustments must stay within their stated ranges.';
+          return;
+        }
+        error.textContent = '';
+        const piecePrice = Math.max(0, values.base + (values.details * 5) + (values.size * 5) + values.personal + values.unique + values.popular - values.discount);
+        const makerShare = 1 - feeRates.commission - feeRates.tax - feeRates.studio;
+        const listingPrice = piecePrice / makerShare;
+        document.getElementById('piece-price').textContent = money.format(piecePrice);
+        document.getElementById('gallery-price').textContent = money.format(listingPrice);
+        document.getElementById('commission').textContent = money.format(listingPrice * feeRates.commission);
+        document.getElementById('sales-tax').textContent = money.format(listingPrice * feeRates.tax);
+        document.getElementById('studio-fee').textContent = money.format(listingPrice * feeRates.studio);
+      }
+      form.addEventListener('input', update);
+      form.addEventListener('change', update);
+      update();
+    })();
+  </script>
+</body>
+</html>
